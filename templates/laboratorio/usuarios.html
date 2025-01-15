@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Checadas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .header {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="header">Lista de Checadas</h1>
+
+    <table id="checadasTable">
+        <thead>
+            <tr>
+                <th>Alumno</th>
+                <th>Código</th>
+                <th>Fecha Entrada</th>
+                <th>Hora Entrada</th>
+                <th>Fecha Salida</th>
+                <th>Hora Salida</th>
+                <th>Horas</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Las filas se actualizarán automáticamente -->
+        </tbody>
+    </table>
+
+    <script>
+        // Conexión al WebSocket
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/checadas/');
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const checadasTableBody = document.querySelector('#checadasTable tbody');
+            checadasTableBody.innerHTML = '';  // Limpiar tabla actual
+
+            data.checadas.forEach(function(checada) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${checada.nombre}</td>
+                    <td>${checada.codigo}</td>
+                    <td>${checada.fechaEntrada}</td>
+                    <td>${checada.horaEntrada}</td>
+                    <td>${checada.fechaSalida}</td>
+                    <td>${checada.horaSalida}</td>
+                    <td>${checada.horas}</td>
+                `;
+                checadasTableBody.appendChild(row);
+            });
+        };
+
+        socket.onclose = function(e) {
+            console.error('WebSocket closed unexpectedly');
+        };
+    </script>
+
+</body>
+</html>
